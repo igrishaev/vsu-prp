@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MTRX_SIZE 9
-#define BLCK_SIZE 3
+#define MTRX_SIZE 1000
+#define BLCK_SIZE 100
 
 typedef int matrix[MTRX_SIZE][MTRX_SIZE];
 typedef int block[BLCK_SIZE][BLCK_SIZE];
@@ -32,11 +32,11 @@ void matrix_print(matrix m) {
   }
 }
 
-void block_add(block b1, block b2, block b3) {
+void block_add(block b1, block b2) {
   int i, j;
   for (i = 0; i < BLCK_SIZE; i++) {
     for (j = 0; j < BLCK_SIZE; j++) {
-      b3[i][j] = b1[i][j] + b2[i][j];
+      b1[i][j] += b2[i][j];
     }
   }
 }
@@ -83,20 +83,34 @@ void block_print(block b) {
   }
 }
 
+void block_reset(block b) {
+  int i, j;
+  for (i = 0; i < BLCK_SIZE; i++) {
+    for (j = 0; j < BLCK_SIZE; j++) {
+      b[i][j] = 0;
+    }
+  }
+}
+
 void matrix_mul(matrix m1, matrix m2, matrix m3) {
   int i, j, k;
-  block b1, b2, b3;
+  block b1, b2, b_mul, b_sum;
   for (i = 0; i < MTRX_SIZE / BLCK_SIZE; i++) {
     for (j = 0; j < MTRX_SIZE / BLCK_SIZE; j++) {
+      block_reset(b_sum);
       for (k = 0; k < MTRX_SIZE / BLCK_SIZE; k++) {
         block_get(b1, m1, i, k);
         block_get(b2, m2, k, j);
-        block_mul(b1, b2, b3);
-        block_add(b1, b2, b3);
+        block_mul(b1, b2, b_mul);
+        block_add(b_sum, b_mul);
       }
-      block_set(b3, m3, i, j);
+      block_set(b_sum, m3, i, j);
     }
   }
+}
+
+matrix *matrix_new(void) {
+  return malloc(sizeof(matrix));
 }
 
 void sep(void) {
@@ -104,32 +118,23 @@ void sep(void) {
 }
 
 int main() {
-  matrix m1, m2, m3;
-  block b1, b2, b3;
+  matrix *m1, *m2, *m3;
+  m1 = matrix_new();
+  m2 = matrix_new();
+  m3 = matrix_new();
 
-  matrix_fill(m1);
-  matrix_fill(m2);
-  matrix_mul(m1, m2, m3);
+  matrix_fill(*m1);
+  matrix_fill(*m2);
+  matrix_mul(*m1, *m2, *m3);
 
-
-  /* block_get(b1, m1, 0, 2); */
-  /* block_set(b1, m3, 0, 2); */
-  /* block_print(b1); */
-  /* matrix_print(m3); */
-
-  matrix_print(m1);
-  sep();
-  matrix_print(m2);
-  sep();
-  matrix_print(m3);
-
-  /* block_get(b1, m1, 0, 2); */
-  /* block_get(b2, m1, 1, 1); */
-  /* block_mul(b1, b2, b3); */
-
-  /* block_print(b1); */
+  /* // Uncomment to see the result. */
+  /* matrix_print(*m1); */
   /* sep(); */
-  /* block_print(b2); */
+  /* matrix_print(*m2); */
   /* sep(); */
-  /* block_print(b3); */
+  /* matrix_print(*m3); */
+
+  free(m1);
+  free(m2);
+  free(m3);
 }
