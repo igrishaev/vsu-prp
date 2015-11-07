@@ -130,7 +130,7 @@ int main() {
   matrix_fill(*m2);
   matrix_mul(*m1, *m2, *m3);
 
-  /* // Uncomment to see the result. */
+  /* Uncomment to see the result. */
   /* matrix_print(*m1); */
   /* sep(); */
   /* matrix_print(*m2); */
